@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Membership Rate Calculator</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        #result {
+            margin-top: 20px;
+        }
+        #membershipTypeDisplay {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">Membership Rate Calculator</h1>
+        <form id="rateForm" class="mt-4">
+            <div class="form-group">
+                <label for="numAdults">Number of Adults:</label>
+                <input type="number" id="numAdults" name="numAdults" class="form-control" value="1" min="1" required>
+            </div>
+            <div class="form-group">
+                <label for="numChildren">Number of Children:</label>
+                <input type="number" id="numChildren" name="numChildren" class="form-control" value="0" min="0" required>
+            </div>
+            <div class="form-group">
+                <label for="age">Your Age:</label>
+                <input type="number" id="age" name="age" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="afterHours">After Hours Plan:</label>
+                <select id="afterHours" name="afterHours" class="form-control" required>
+                    <option value="no">No</option>
+                    <option value="yes">Yes</option>
+                </select>
+            </div>
+            <button type="button" class="btn btn-success btn-block" onclick="calculateRate()">Calculate</button>
+        </form>
+        <div id="result">
+            <h2>Result:</h2>
+            <p id="membershipTypeDisplay"></p>
+            <p id="rateResult"></p>
+        </div>
+    </div>
+
+    <script>
+        function calculateRate() {
+            const numAdults = parseInt(document.getElementById('numAdults').value);
+            const numChildren = parseInt(document.getElementById('numChildren').value);
+            const age = parseInt(document.getElementById('age').value);
+            const afterHours = document.getElementById('afterHours').value;
+            let rate = 0;
+            let membershipType = '';
+
+            // Determine membership type
+            if (numAdults === 1 && numChildren === 0) {
+                membershipType = 'Single Person';
+                rate = 225;
+            } else if (numAdults === 1 && numChildren === 1) {
+                if (age > 29) {
+                    membershipType = 'Single + Child under 18';
+                    rate = 300;
+                } else {
+                    alert('For Single + Child membership, adult must be over 29.');
+                    return;
+                }
+            } else if (numAdults === 2 && numChildren === 0) {
+                const coupleAge1 = age; // assuming current input age is for the first adult
+                const coupleAge2 = parseInt(prompt('Enter the age of the second adult:'));
+                if (coupleAge1 > 29 && coupleAge2 > 29) {
+                    membershipType = 'Couple';
+                    rate = 350;
+                } else {
+                    alert('For Couple membership, both individuals must be over 29.');
+                    return;
+                }
+            } else if (numAdults >= 1 && (numChildren >= 1 || numChildren <= 2)) {
+                membershipType = 'Family (3 or 4 people)';
+                rate = 399;
+                if (numChildren > 2) {
+                    const additionalChildren = numChildren - 2;
+                    rate += additionalChildren * 50;
+                }
+            } else {
+                alert('Invalid membership configuration.');
+                return;
+            }
+
+            // Apply special rates
+            if (age >= 16 && age <= 29) {
+                rate = 189;
+                membershipType = 'Junior';
+            } else if (age >= 65) {
+                rate = 189;
+                membershipType = 'Senior';
+            }
+
+            // Display result
+            document.getElementById('membershipTypeDisplay').innerText = `Membership Type: ${membershipType}`;
+            document.getElementById('rateResult').innerText = `The monthly rate for the selected membership is $${rate}`;
+        }
+    </script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
