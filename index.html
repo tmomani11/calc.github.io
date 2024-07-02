@@ -5,80 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Membership Rate Calculator</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f8f9fa;
-            color: #333;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            text-align: center;
-            margin-bottom: 20px;
-            font-size: 24px;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-        }
-        input, select {
-            width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        button {
-            width: 100%;
-            padding: 10px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        button:hover {
-            background-color: #218838;
-        }
-        #result {
-            margin-top: 20px;
-            text-align: center;
-        }
-        #result h2 {
-            font-size: 20px;
-            margin-bottom: 10px;
-        }
-        #result p {
-            font-size: 18px;
-            margin: 5px 0;
-        }
-        @media (max-width: 768px) {
-            .container {
-                margin: 20px;
-                padding: 15px;
-            }
-            h1 {
-                font-size: 20px;
-            }
-            button {
-                font-size: 14px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 <div class="container">
@@ -93,7 +20,7 @@
             <input type="number" id="numChildren" name="numChildren" value="0" min="0" required>
         </div>
         <div class="form-group">
-            <label for="age">Guest Age:</label>
+            <label for="age">Your Age:</label>
             <input type="number" id="age" name="age" required>
         </div>
         <div class="form-group">
@@ -104,6 +31,7 @@
             </select>
         </div>
         <button type="button" onclick="calculateRate()">Calculate</button>
+        <button type="button" id="clearButton" onclick="clearForm()">Clear</button>
     </form>
     <div id="result">
         <h2>Result:</h2>
@@ -124,7 +52,7 @@
         // Determine membership type
         if (numAdults === 1 && numChildren === 0) {
             membershipType = 'Single Person';
-            rate = 225;
+            rate = afterHours === 'yes' ? 125 : 225;
         } else if (numAdults === 1 && numChildren === 1) {
             if (age > 29) {
                 membershipType = 'Single + Child under 18';
@@ -138,7 +66,7 @@
             const coupleAge2 = parseInt(prompt('Enter the age of the second adult:'));
             if (coupleAge1 > 29 && coupleAge2 > 29) {
                 membershipType = 'Couple';
-                rate = 350;
+                rate = afterHours === 'yes' ? 250 : 350;
             } else {
                 alert('For Couple membership, both individuals must be over 29.');
                 return;
@@ -167,6 +95,12 @@
         // Display result
         document.getElementById('membershipTypeDisplay').innerText = `Membership Type: ${membershipType}`;
         document.getElementById('rateResult').innerText = `The monthly rate for the selected membership is $${rate}`;
+    }
+
+    function clearForm() {
+        document.getElementById('rateForm').reset();
+        document.getElementById('membershipTypeDisplay').innerText = '';
+        document.getElementById('rateResult').innerText = '';
     }
 </script>
 </body>
