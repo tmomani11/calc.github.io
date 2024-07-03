@@ -12,20 +12,28 @@
     <h1>Membership Rate Calculator</h1>
     <form id="rateForm">
         <div class="form-group">
+            <label for="rateCategory">Rate Category:</label>
+            <select id="rateCategory" name="rateCategory" class="form-control" required>
+                <option value="resort">Resort Rates</option>
+                <option value="premier">Premier Rates</option>
+                <option value="friends">Friends Membership</option>
+            </select>
+        </div>
+        <div class="form-group">
             <label for="numAdults">Number of Adults:</label>
-            <input type="number" id="numAdults" name="numAdults" value="1" min="1" required>
+            <input type="number" id="numAdults" name="numAdults" value="1" min="1" class="form-control" required>
         </div>
         <div class="form-group">
             <label for="numChildren">Number of Children:</label>
-            <input type="number" id="numChildren" name="numChildren" value="0" min="0" required>
+            <input type="number" id="numChildren" name="numChildren" value="0" min="0" class="form-control" required>
         </div>
         <div class="form-group">
             <label for="age">Guest Age:</label>
-            <input type="number" id="age" name="age" required>
+            <input type="number" id="age" name="age" class="form-control" required>
         </div>
         <div class="form-group">
             <label for="afterHours">After Hours Plan:</label>
-            <select id="afterHours" name="afterHours" required>
+            <select id="afterHours" name="afterHours" class="form-control" required>
                 <option value="no">No</option>
                 <option value="yes">Yes</option>
             </select>
@@ -42,6 +50,7 @@
 
 <script>
     function calculateRate() {
+        const rateCategory = document.getElementById('rateCategory').value;
         const numAdults = parseInt(document.getElementById('numAdults').value);
         const numChildren = parseInt(document.getElementById('numChildren').value);
         const age = parseInt(document.getElementById('age').value);
@@ -49,14 +58,50 @@
         let rate = 0;
         let membershipType = '';
 
-        // Determine membership type
-        if (numAdults === 1 && numChildren === 0) {
+        // Determine base rates based on category
+        const rates = {
+            resort: {
+                single: 225,
+                couple: 350,
+                family: 399,
+                additionalChild: 50,
+                singleAfterHours: 125,
+                coupleAfterHours: 250
+            },
+            premier: {
+                single: 200,
+                couple: 316,
+                family: 399,
+                additionalChild: 50
+            },
+            friends: {
+                single: 225,
+                additionalPerson: 125,
+                maxRate: 600
+            }
+        };
+
+        // Apply rates based on selection
+        const selectedRates = rates[rateCategory];
+
+        // Determine membership type and rate
+        if (rateCategory === 'friends') {
+            if (numAdults < 1 || age < 18) {
+                alert('Friends membership requires at least one adult age 18 or older.');
+                return;
+            }
+            membershipType = 'Friends Membership';
+            rate = selectedRates.single + (numAdults - 1) * selectedRates.additionalPerson;
+            if (rate > selectedRates.maxRate) {
+                rate = selectedRates.maxRate;
+            }
+        } else if (numAdults === 1 && numChildren === 0) {
             membershipType = 'Single Person';
-            rate = afterHours === 'yes' ? 125 : 225;
+            rate = afterHours === 'yes' ? selectedRates.singleAfterHours : selectedRates.single;
         } else if (numAdults === 1 && numChildren === 1) {
             if (age > 29) {
                 membershipType = 'Single + Child under 18';
-                rate = 300;
+                rate = selectedRates.single + 75; // Assuming 75 is the rate for a child in Premier
             } else {
                 alert('For Single + Child membership, adult must be over 29.');
                 return;
@@ -66,17 +111,17 @@
             const coupleAge2 = parseInt(prompt('Enter the age of the second adult:'));
             if (coupleAge1 > 29 && coupleAge2 > 29) {
                 membershipType = 'Couple';
-                rate = afterHours === 'yes' ? 250 : 350;
+                rate = afterHours === 'yes' ? selectedRates.coupleAfterHours : selectedRates.couple;
             } else {
                 alert('For Couple membership, both individuals must be over 29.');
                 return;
             }
         } else if (numAdults >= 1 && (numChildren >= 1 || numChildren <= 2)) {
             membershipType = 'Family (3 or 4 people)';
-            rate = 399;
+            rate = selectedRates.family;
             if (numChildren > 2) {
                 const additionalChildren = numChildren - 2;
-                rate += additionalChildren * 50;
+                rate += additionalChildren * selectedRates.additionalChild;
             }
         } else {
             alert('Invalid membership configuration.');
