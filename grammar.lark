@@ -1,0 +1,26 @@
+?start: expr
+
+# Expression rules for addition and subtraction
+?expr: expr "+" term     -> add
+     | expr "-" term     -> sub
+     | term
+
+# Term rules for multiplication and division
+?term: term "*" factor   -> mul
+     | term "/" factor   -> div
+     | factor
+
+# Factor rules for logarithm, exponentiation, and atoms
+?factor: factor "^" atom        -> pow
+       | atom
+
+# Atom rules for negation, parentheses, and numbers, with higher precedence for "log"
+?atom: "log" expr "base" expr -> log
+     | "-" atom               -> neg
+     | "(" expr ")"
+     | NUMBER
+
+# Importing standard number and whitespace handling
+%import common.NUMBER
+%import common.WS
+%ignore WS
